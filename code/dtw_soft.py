@@ -19,7 +19,7 @@ def soft_min(list_a, gamma):
         _min = torch.min(list_a)
     else:
         z = -list_a / gamma
-        log_sum = max(z) + torch.log(torch.sum(torch.exp(z - max(z))))
+        log_sum = torch.max(z) + torch.log(torch.sum(torch.exp(z - max(z))))
         _min = -gamma * log_sum
     return _min
 
@@ -39,4 +39,21 @@ def soft_dtw(x, y, gamma=1.0):
     n = len(x)
     m = len(y)
     R = torch.zeros((n + 1, m + 1))
+    R[0, 1:] = float('inf')
+    R[1:, 0] = float('inf')
+    R[0, 0] = 0.0
+    
+    for j in range(1, m + 1):
+        for i in range(1, n + 1):
+            # calculate distance
+            cost = (x[i - 1] - y[j - 1])**2
+            
+            # calculate minimum
+            _min = soft_min([R[i - 1, j], R[i, j - 1], R[i - 1, j - 1]], gamma)
+            
+            # update cell
+            R[i, j] = cost + _min
+            
+    return R[-1, -1], R
+    
     
