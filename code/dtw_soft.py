@@ -164,8 +164,8 @@ def soft_dtw_batch_same_size(x: torch.Tensor, y: torch.Tensor, gamma: float = 1)
     """Soft Dynamic Time Warping.
 
     Args:
-        x (list): Channel x length x feature
-        y (list): Channel x length x feature
+        x (list): batch x length x feature
+        y (list): batch x length x feature
         gamma (float, optional): gamma parameter. Defaults to 1.0.
 
     Returns:
@@ -207,7 +207,7 @@ def backward_recursion_batch_same_size(
         gamma (float, optional): gamma parameter. Defaults to 1.0.
 
     Returns:
-        torch.Tensor: E matrix
+        torch.Tensor: E batch x matrix
     """
     batch = x.shape[0]
     n, m = x.shape[1], y.shape[1]
