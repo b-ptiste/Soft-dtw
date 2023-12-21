@@ -81,8 +81,8 @@ def backward_recursion_batch_same_size(
     n, m = x.shape[1], y.shape[1]
 
     # intialization
-    delta = torch.cat((delta, torch.zeros((batch,n)).reshape(batch, -1, 1)).to(device), dim=2)
-    delta = torch.cat((delta, torch.zeros((batch,m + 1)).reshape(batch, 1, -1)).to(device), dim=1)
+    delta = torch.cat((delta, torch.zeros((batch,n)).reshape(batch, -1, 1).to(device)), dim=2)
+    delta = torch.cat((delta, torch.zeros((batch,m + 1)).reshape(batch, 1, -1).to(device)), dim=1)
     delta[:, n, m] = 0.0
 
     # compute E
@@ -91,8 +91,8 @@ def backward_recursion_batch_same_size(
 
     # compute R
     # _, R = soft_dtw_batch_same_size(x, y, gamma=gamma)
-    R = torch.cat((R, -float("inf") * torch.ones((batch,n + 1)).reshape(batch, -1, 1)).to(device), dim=2)
-    R = torch.cat((R, -float("inf") * torch.ones((batch,m + 2)).reshape(batch, 1, -1)).to(device), dim=1)
+    R = torch.cat((R, -float("inf") * torch.ones((batch,n + 1)).reshape(batch, -1, 1).to(device)), dim=2)
+    R = torch.cat((R, -float("inf") * torch.ones((batch,m + 2)).reshape(batch, 1, -1).to(device)), dim=1)
     R[:, n + 1, m + 1] = R[:, n, m]
 
     # backward recursion
