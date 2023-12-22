@@ -140,7 +140,7 @@ class SoftDTWFunction_batch_same_size(torch.autograd.Function):
         x, y, R, delta = ctx.saved_tensors
         E = backward_recursion_batch_same_size(x, y, R, delta, ctx.gamma)
         q = jacobian_product_sq_euc_batch(x, y, E)
-        return q/x.shape[0], None, None
+        return q/x.shape[0]/x.shape[1], None, None
 
 
 class DTWLoss(torch.nn.Module):
