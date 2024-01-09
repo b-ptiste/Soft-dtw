@@ -137,6 +137,7 @@ def backward_recursion(
 
     return E[1:-1, 1:-1]
 
+
 def jacobian_product_sq_euc_optimized(X, Y, E):
     # Expand X and Y to 3D tensors for broadcasting
     X_expanded = X.unsqueeze(1)  # Shape: [m, 1, d]
@@ -151,6 +152,7 @@ def jacobian_product_sq_euc_optimized(X, Y, E):
     # Sum over the second dimension (n) to get the result, shape: [m, d]
     G = weighted_diff.sum(dim=1)
     return G
+
 
 def soft_min_batch(list_a, gamma):
     """Softmin function.
@@ -175,7 +177,10 @@ def soft_min_batch(list_a, gamma):
         _min = -gamma * log_sum
     return _min
 
-def soft_dtw_batch_same_size(x: torch.Tensor, y: torch.Tensor, gamma: float = 1) -> torch.Tensor:
+
+def soft_dtw_batch_same_size(
+    x: torch.Tensor, y: torch.Tensor, gamma: float = 1
+) -> torch.Tensor:
     """Soft Dynamic Time Warping.
 
     Args:
@@ -206,7 +211,9 @@ def soft_dtw_batch_same_size(x: torch.Tensor, y: torch.Tensor, gamma: float = 1)
 
     for i in range(1, n + 1):
         for j in range(1, m + 1):
-            R[:, i, j] = cost[:, i - 1, j - 1] + soft_min_batch([R[:, i - 1, j], R[:, i, j - 1], R[:, i - 1, j - 1]], gamma)
+            R[:, i, j] = cost[:, i - 1, j - 1] + soft_min_batch(
+                [R[:, i - 1, j], R[:, i, j - 1], R[:, i - 1, j - 1]], gamma
+            )
 
     return R[:, -1, -1], R, cost
 
@@ -228,8 +235,8 @@ def backward_recursion_batch_same_size(
     n, m = x.shape[1], y.shape[1]
 
     # intialization
-    delta = torch.cat((delta, torch.zeros((batch,n)).reshape(batch, -1, 1)), dim=2)
-    delta = torch.cat((delta, torch.zeros((batch,m + 1)).reshape(batch, 1, -1)), dim=1)
+    delta = torch.cat((delta, torch.zeros((batch, n)).reshape(batch, -1, 1)), dim=2)
+    delta = torch.cat((delta, torch.zeros((batch, m + 1)).reshape(batch, 1, -1)), dim=1)
     delta[:, n, m] = 0.0
 
     # compute E
@@ -238,8 +245,12 @@ def backward_recursion_batch_same_size(
 
     # compute R
     # _, R = soft_dtw_batch_same_size(x, y, gamma=gamma)
-    R = torch.cat((R, -float("inf") * torch.ones((batch,n + 1)).reshape(batch, -1, 1)), dim=2)
-    R = torch.cat((R, -float("inf") * torch.ones((batch,m + 2)).reshape(batch, 1, -1)), dim=1)
+    R = torch.cat(
+        (R, -float("inf") * torch.ones((batch, n + 1)).reshape(batch, -1, 1)), dim=2
+    )
+    R = torch.cat(
+        (R, -float("inf") * torch.ones((batch, m + 2)).reshape(batch, 1, -1)), dim=1
+    )
     R[:, n + 1, m + 1] = R[:, n, m]
 
     # backward recursion
@@ -248,9 +259,12 @@ def backward_recursion_batch_same_size(
             a = torch.exp((R[:, i + 1, j] - R[:, i, j] - delta[:, i, j - 1]) / gamma)
             b = torch.exp((R[:, i, j + 1] - R[:, i, j] - delta[:, i - 1, j]) / gamma)
             c = torch.exp((R[:, i + 1, j + 1] - R[:, i, j] - delta[:, i, j]) / gamma)
-            E[:, i, j] = E[:, i + 1, j] * a + E[:, i, j + 1] * b + E[:, i + 1, j + 1] * c
+            E[:, i, j] = (
+                E[:, i + 1, j] * a + E[:, i, j + 1] * b + E[:, i + 1, j + 1] * c
+            )
 
     return E[:, 1:-1, 1:-1]
+
 
 def jacobian_product_sq_euc_batch(X, Y, E):
     # Expand X and Y to 4D tensors for broadcasting, shape: [b, m, 1, d] and [b, 1, n, d]

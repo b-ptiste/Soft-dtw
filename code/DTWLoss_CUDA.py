@@ -1,5 +1,7 @@
 import torch
-#from dtw_soft import soft_dtw_batch_same_size, backward_recursion_batch_same_size, jacobian_product_sq_euc_batch
+
+# from dtw_soft import soft_dtw_batch_same_size, backward_recursion_batch_same_size, jacobian_product_sq_euc_batch
+
 
 def soft_min_batch(list_a, gamma):
     """Softmin function.
@@ -25,7 +27,10 @@ def soft_min_batch(list_a, gamma):
         _min = -gamma * log_sum
     return _min
 
-def soft_dtw_batch_same_size(x: torch.Tensor, y: torch.Tensor, gamma: float = 1) -> torch.Tensor:
+
+def soft_dtw_batch_same_size(
+    x: torch.Tensor, y: torch.Tensor, gamma: float = 1
+) -> torch.Tensor:
     """Soft Dynamic Time Warping.
 
     Args:
@@ -58,7 +63,9 @@ def soft_dtw_batch_same_size(x: torch.Tensor, y: torch.Tensor, gamma: float = 1)
 
     for i in range(1, n + 1):
         for j in range(1, m + 1):
-            R[:, i, j] = cost[:, i - 1, j - 1] + soft_min_batch([R[:, i - 1, j], R[:, i, j - 1], R[:, i - 1, j - 1]], gamma)
+            R[:, i, j] = cost[:, i - 1, j - 1] + soft_min_batch(
+                [R[:, i - 1, j], R[:, i, j - 1], R[:, i - 1, j - 1]], gamma
+            )
 
     return R[:, -1, -1], R, cost
 
@@ -81,8 +88,12 @@ def backward_recursion_batch_same_size(
     n, m = x.shape[1], y.shape[1]
 
     # intialization
-    delta = torch.cat((delta, torch.zeros((batch,n)).reshape(batch, -1, 1).to(device)), dim=2)
-    delta = torch.cat((delta, torch.zeros((batch,m + 1)).reshape(batch, 1, -1).to(device)), dim=1)
+    delta = torch.cat(
+        (delta, torch.zeros((batch, n)).reshape(batch, -1, 1).to(device)), dim=2
+    )
+    delta = torch.cat(
+        (delta, torch.zeros((batch, m + 1)).reshape(batch, 1, -1).to(device)), dim=1
+    )
     delta[:, n, m] = 0.0
 
     # compute E
@@ -91,8 +102,20 @@ def backward_recursion_batch_same_size(
 
     # compute R
     # _, R = soft_dtw_batch_same_size(x, y, gamma=gamma)
-    R = torch.cat((R, -float("inf") * torch.ones((batch,n + 1)).reshape(batch, -1, 1).to(device)), dim=2)
-    R = torch.cat((R, -float("inf") * torch.ones((batch,m + 2)).reshape(batch, 1, -1).to(device)), dim=1)
+    R = torch.cat(
+        (
+            R,
+            -float("inf") * torch.ones((batch, n + 1)).reshape(batch, -1, 1).to(device),
+        ),
+        dim=2,
+    )
+    R = torch.cat(
+        (
+            R,
+            -float("inf") * torch.ones((batch, m + 2)).reshape(batch, 1, -1).to(device),
+        ),
+        dim=1,
+    )
     R[:, n + 1, m + 1] = R[:, n, m]
 
     # backward recursion
@@ -101,9 +124,12 @@ def backward_recursion_batch_same_size(
             a = torch.exp((R[:, i + 1, j] - R[:, i, j] - delta[:, i, j - 1]) / gamma)
             b = torch.exp((R[:, i, j + 1] - R[:, i, j] - delta[:, i - 1, j]) / gamma)
             c = torch.exp((R[:, i + 1, j + 1] - R[:, i, j] - delta[:, i, j]) / gamma)
-            E[:, i, j] = E[:, i + 1, j] * a + E[:, i, j + 1] * b + E[:, i + 1, j + 1] * c
+            E[:, i, j] = (
+                E[:, i + 1, j] * a + E[:, i, j + 1] * b + E[:, i + 1, j + 1] * c
+            )
 
     return E[:, 1:-1, 1:-1]
+
 
 def jacobian_product_sq_euc_batch(X, Y, E):
     # Expand X and Y to 4D tensors for broadcasting, shape: [b, m, 1, d] and [b, 1, n, d]
@@ -123,6 +149,7 @@ def jacobian_product_sq_euc_batch(X, Y, E):
     G = weighted_diff.sum(dim=2)
     return G
 
+
 class SoftDTWFunction_batch_same_size(torch.autograd.Function):
     @staticmethod
     def forward(ctx, input, target, gamma):
@@ -140,21 +167,25 @@ class SoftDTWFunction_batch_same_size(torch.autograd.Function):
         x, y, R, delta = ctx.saved_tensors
         E = backward_recursion_batch_same_size(x, y, R, delta, ctx.gamma)
         q = jacobian_product_sq_euc_batch(x, y, E)
-        return q/x.shape[0]/x.shape[1], None, None
+        return q / x.shape[0] / x.shape[1], None, None
 
 
 class DTWLoss(torch.nn.Module):
-    def __init__(self, gamma=1,reduction='mean'):
+    def __init__(self, gamma=1, reduction="mean"):
         super(DTWLoss, self).__init__()
         self.gamma = gamma
         self.reduction = reduction
 
     def forward(self, input, target):
         # Use self.param in your loss computation
-        if self.reduction == 'mean':
-            loss =torch.mean(SoftDTWFunction_batch_same_size.apply(input, target, self.gamma))
-        elif self.reduction == 'sum':
-            loss =torch.sum(SoftDTWFunction_batch_same_size.apply(input, target, self.gamma))
+        if self.reduction == "mean":
+            loss = torch.mean(
+                SoftDTWFunction_batch_same_size.apply(input, target, self.gamma)
+            )
+        elif self.reduction == "sum":
+            loss = torch.sum(
+                SoftDTWFunction_batch_same_size.apply(input, target, self.gamma)
+            )
         else:
-            raise 
+            raise
         return loss
