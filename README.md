@@ -1,6 +1,6 @@
 # Authors : 
 - CALLARD Baptiste (MVA)
-- SENEVILLE Adhemar (MVA)
+- DE SENNEVILLE Adhemar (MVA)
 
 # Work overview
 Dans le cadre du cours **Apprentissage pour les séries temporelles** du cours de L. OUDRE nous avons étudier le papier "Soft-DTW: a Differentiable Loss Function for Time-Series".
