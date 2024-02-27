@@ -26,7 +26,6 @@ from DTWLoss_CUDA import DTWLoss
 # load data
 ucr = UCR_UEA_datasets()
 X_train, y_train, X_test, y_test = ucr.load_dataset("SonyAIBORobotSurface2")
-from DTWLoss_CUDA import DTWLoss
 
 # convert to torch
 X_train = torch.from_numpy(X_train).float().requires_grad_(True)
