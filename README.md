@@ -1,18 +1,19 @@
 # Work overview
-Dans le cadre du cours **Apprentissage pour les séries temporelles** du cours de L. OUDRE nous avons étudier le papier "Soft-DTW: a Differentiable Loss Function for Time-Series".
 
-The report delves into Soft-Dynamic Time Warping (Soft-DTW), a differentiable version of Dynamic Time Warping, suitable for gradient-based optimization in machine learning. It involves reimplementation of models, theoretical and practical analysis, and experimentation with datasets like ArrowHead and ECG200. The findings include :
+The report delves into Soft-Dynamic Time Warping (Soft-DTW), a differentiable version of Dynamic Time Warping, suitable for gradient-based optimization in machine learning. It involves reimplementation of the algorithm, theoretical and practical analysis, and experimentation with datasets like ArrowHead and ECG200. The findings include :
 
-- An optimized PyTorch-compatible Soft-DTW
+- PyTorch-compatible Soft-DTW
 - Applications in barycenter averaging
 - K-Means clustering
 - Anomaly detection
 
-The report concludes with the potential and computational challenges of Soft-DTW, suggesting directions for future research.
+While the report concludes with the greate applications of the Soft-DTW loss, the time complexity is too large. It suggests directions for future research.
 
 # Simple utilisation 
 
-Our code is compatible with any native **Pytorch** implementation. We over-write the backward for efficiency purposes.
+Our code is compatible with any native **Pytorch** implementation. 
+
+We **re-implemented the backward** for efficiency purposes 🚀.
 
 ```python
 import torch
