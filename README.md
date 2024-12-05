@@ -2,7 +2,7 @@
 
 The report delves into Soft-Dynamic Time Warping (Soft-DTW), a differentiable version of Dynamic Time Warping, suitable for gradient-based optimization in machine learning. It involves reimplementation of the algorithm, theoretical and practical analysis, and experimentation with datasets like ArrowHead and ECG200. The findings include :
 
-- PyTorch-compatible Soft-DTW
+- PyTorch-compatible loss with custom backward for efficiency purposes 🚀 : **Soft-DTW**
 - Applications in barycenter averaging
 - K-Means clustering
 - Anomaly detection
